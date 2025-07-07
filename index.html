@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>EF – Gestion des prêts</title>
+  <link rel="icon" href="data:," />
+
+  <!-- Tailwind & Chart.js CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 text-gray-800 p-6">
+
+  <h1 class="text-3xl font-bold mb-6">Établissement Financier – Gestion des prêts</h1>
+
+  <!-- ========== 1. AJOUT FONDS ========== -->
+  <section class="bg-white/60 backdrop-blur rounded-lg p-4 mb-6 shadow">
+    <h2 class="text-xl font-semibold mb-4">Ajouter un fond</h2>
+    <form id="form-fond" class="flex flex-wrap gap-4 items-end">
+      <label class="grow">
+        <span class="block text-sm font-medium">Montant</span>
+        <input type="number" step="0.01" required name="montant" class="w-full border rounded p-2">
+      </label>
+      <label>
+        <span class="block text-sm font-medium">Date</span>
+        <input type="date" required name="date_ajout" class="border rounded p-2">
+      </label>
+      <button class="bg-blue-600 text-white px-4 py-2 rounded" type="submit">Ajouter</button>
+    </form>
+  </section>
+
+  <!-- ========== 2. AJOUT TYPE PRÊT ========== -->
+  <section class="bg-white/60 backdrop-blur rounded-lg p-4 mb-6 shadow">
+    <h2 class="text-xl font-semibold mb-4">Ajouter un type de prêt</h2>
+    <form id="form-typepret" class="flex flex-wrap gap-4 items-end">
+      <label class="grow">
+        <span class="block text-sm font-medium">Libellé</span>
+        <input type="text" required name="libelle" class="w-full border rounded p-2">
+      </label>
+      <label>
+        <span class="block text-sm font-medium">Taux % annuel</span>
+        <input type="number" step="0.01" required name="taux" class="border rounded p-2">
+      </label>
+      <button class="bg-blue-600 text-white px-4 py-2 rounded" type="submit">Ajouter</button>
+    </form>
+  </section>
+
+  <!-- ========== 3. AJOUT CLIENT ========== -->
+  <section class="bg-white/60 backdrop-blur rounded-lg p-4 mb-6 shadow">
+    <h2 class="text-xl font-semibold mb-4">Ajouter un client</h2>
+    <form id="form-client" class="flex flex-wrap gap-4 items-end">
+      <label class="grow">
+        <span class="block text-sm font-medium">Prénom</span>
+        <input type="text" required name="prenom" class="w-full border rounded p-2">
+      </label>
+      <label class="grow">
+        <span class="block text-sm font-medium">Nom</span>
+        <input type="text" required name="nom" class="w-full border rounded p-2">
+      </label>
+      <button class="bg-blue-600 text-white px-4 py-2 rounded" type="submit">Ajouter</button>
+    </form>
+  </section>
+
+  <!-- ========== 4. CRÉATION PRÊT ========== -->
+  <section class="bg-white/60 backdrop-blur rounded-lg p-4 mb-6 shadow">
+    <h2 class="text-xl font-semibold mb-4">Créer un prêt</h2>
+    <form id="form-pret" class="grid md:grid-cols-2 gap-4 items-end mb-4">
+      <label>
+        <span class="block text-sm font-medium">Client</span>
+        <select id="select-client" required name="client_id" class="border rounded p-2 w-full"></select>
+      </label>
+      <label>
+        <span class="block text-sm font-medium">Type de prêt</span>
+        <select id="select-typepret" required name="type_pret_id" class="border rounded p-2 w-full"></select>
+      </label>
+      <label>
+        <span class="block text-sm font-medium">Montant</span>
+        <input type="number" step="0.01" required name="montant" class="border rounded p-2 w-full">
+      </label>
+      <label>
+        <span class="block text-sm font-medium">Date début</span>
+        <input type="date" required name="date_debut" class="border rounded p-2 w-full">
+      </label>
+      <label>
+        <span class="block text-sm font-medium">Durée (mois)</span>
+        <input type="number" required name="duree_mois" class="border rounded p-2 w-full">
+      </label>
+      <label>
+        <span class="block text-sm font-medium">Assurance (%)</span>
+        <input type="number" step="0.01" name="taux_assurance" class="border rounded p-2 w-full">
+      </label>
+      <button class="bg-blue-600 text-white px-4 py-2 rounded col-span-full md:w-max" type="submit">
+        Créer le prêt
+      </button>
+    </form>
+
+    <!-- Bouton Ajax liste prêts -->
+    <button id="btn-list-prets" class="bg-purple-600 text-white px-4 py-2 rounded mb-4">
+      Liste prêts
+    </button>
+
+    <!-- Tableau Ajax -->
+    <div class="overflow-x-auto">
+      <table class="min-w-full border-collapse text-center" id="table-prets">
+        <thead>
+          <tr class="bg-gray-200 text-sm">
+            <th class="border p-2">ID</th>
+            <th class="border p-2">Client</th>
+            <th class="border p-2">Type</th>
+            <th class="border p-2">Montant</th>
+            <th class="border p-2">Mensualité</th>
+            <th class="border p-2">Durée</th>
+            <th class="border p-2">Début</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ========== 5. STATISTIQUES INTÉRÊTS ========== -->
+  <section class="bg-white/60 backdrop-blur rounded-lg p-4 shadow">
+    <h2 class="text-xl font-semibold mb-4">Intérêts gagnés</h2>
+    <form id="form-filtre" class="flex flex-wrap gap-4 items-end mb-4">
+      <label>
+        <span class="block text-sm font-medium">Client (optionnel)</span>
+        <select id="filtre-client" name="client_id" class="border rounded p-2">
+          <option value="">Tous</option>
+        </select>
+      </label>
+      <label>
+        <span class="block text-sm font-medium">Mois début</span>
+        <input type="number" min="1" max="12" name="mois_debut" required class="border rounded p-2 w-24">
+      </label>
+      <label>
+        <span class="block text-sm font-medium">Année début</span>
+        <input type="number" name="annee_debut" required class="border rounded p-2 w-28">
+      </label>
+      <label>
+        <span class="block text-sm font-medium">Mois fin</span>
+        <input type="number" min="1" max="12" name="mois_fin" required class="border rounded p-2 w-24">
+      </label>
+      <label>
+        <span class="block text-sm font-medium">Année fin</span>
+        <input type="number" name="annee_fin" required class="border rounded p-2 w-28">
+      </label>
+      <button class="bg-green-600 text-white px-4 py-2 rounded" type="submit">Afficher</button>
+    </form>
+
+    <!-- Tableau -->
+    <div class="overflow-x-auto">
+      <table class="min-w-full border-collapse text-center" id="table-interets">
+        <thead>
+          <tr class="bg-gray-200">
+            <th class="border p-2">Année</th>
+            <th class="border p-2">Mois</th>
+            <th class="border p-2">Intérêt&nbsp;(Ar)</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+
+    <!-- Graphique -->
+    <canvas id="chart-interets" class="mt-6"></canvas>
+  </section>
+
+  <!-- ========== JS ========== -->
+  <script>
+    const API = 'http://localhost:8000';
+    const $   = sel => document.querySelector(sel);
+
+    /* ---------- Helpers ---------- */
+    async function postJson(url, body) {
+      const r = await fetch(API + url, {
+        method : 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body   : JSON.stringify(body)
+      });
+      if (!r.ok) throw await r.text();
+      return r.json();
+    }
+    async function getJson(url) {
+      const r   = await fetch(API + url);
+      const txt = await r.text();
+      if (!r.ok) throw txt;
+      return JSON.parse(txt);
+    }
+
+    /* ---------- 1. Fonds ---------- */
+    $('#form-fond').addEventListener('submit', async e => {
+      e.preventDefault();
+      await postJson('/fonds', Object.fromEntries(new FormData(e.target)));
+      alert('Fond ajouté ✅');
+      e.target.reset();
+    });
+
+    /* ---------- 2. Type de prêt ---------- */
+    $('#form-typepret').addEventListener('submit', async e => {
+      e.preventDefault();
+      await postJson('/typeprets', Object.fromEntries(new FormData(e.target)));
+      alert('Type de prêt ajouté ✅');
+      e.target.reset();
+      refreshTypes();
+    });
+
+    /* ---------- 3. Client ---------- */
+    $('#form-client').addEventListener('submit', async e => {
+      e.preventDefault();
+      await postJson('/clients', Object.fromEntries(new FormData(e.target)));
+      alert('Client ajouté ✅');
+      e.target.reset();
+      refreshClients();
+    });
+
+    /* ---------- 4. Prêt ---------- */
+    $('#form-pret').addEventListener('submit', async e => {
+      e.preventDefault();
+      await postJson('/prets', Object.fromEntries(new FormData(e.target)));
+      alert('Prêt créé ✅');
+      e.target.reset();
+    });
+
+    /* ----- Liste prêts ----- */
+    async function refreshPrets() {
+      const rows  = await getJson('/prets');
+      const tbody = $('#table-prets tbody');
+      tbody.innerHTML = '';
+      rows.forEach(r => {
+        tbody.insertAdjacentHTML('beforeend', `
+          <tr class="text-sm">
+            <td class="border p-1">${r.id}</td>
+            <td class="border p-1">${r.prenom} ${r.nom}</td>
+            <td class="border p-1">${r.libelle}</td>
+            <td class="border p-1">${r.montant.toLocaleString()}</td>
+            <td class="border p-1">${r.mensualite.toLocaleString(undefined,{maximumFractionDigits:2})}</td>
+            <td class="border p-1">${r.duree_mois}</td>
+            <td class="border p-1">${r.date_debut}</td>
+          </tr>`);
+      });
+    }
+    $('#btn-list-prets').addEventListener('click', refreshPrets);
+
+    /* ---------- 5. Statistiques intérêts ---------- */
+    let chart;
+    $('#form-filtre').addEventListener('submit', async e => {
+      e.preventDefault();
+      const p = new URLSearchParams(new FormData(e.target));
+      const url = p.get('client_id')
+        ? '/interets_client?' + p.toString()
+        : '/interets?' + p.toString().replace('client_id=', '');
+
+      const rows = await getJson(url);
+      const tbody = $('#table-interets tbody');
+      tbody.innerHTML = '';
+      rows.forEach(r => {
+        tbody.insertAdjacentHTML('beforeend', `
+          <tr>
+            <td class="border p-2">${r.annee}</td>
+            <td class="border p-2">${r.mois}</td>
+            <td class="border p-2">${r.total.toLocaleString()}</td>
+          </tr>`);
+      });
+
+      const labels = rows.map(r => `${r.mois}/${r.annee}`);
+      const data   = rows.map(r => r.total);
+      if (chart) chart.destroy();
+      chart = new Chart($('#chart-interets'), {
+        type: 'line',
+        data: { labels, datasets: [{ label: 'Intérêt (Ar)', data, tension: 0.3 }] },
+        options: { responsive: true, plugins: { legend: { display: false } } }
+      });
+    });
+
+    /* ---------- Sélecteurs dynamiques ---------- */
+    async function refreshClients() {
+      const arr  = await getJson('/clients');
+      const sel  = $('#select-client');
+      const filt = $('#filtre-client');
+      sel.innerHTML = filt.innerHTML = '<option value="">Choisir…</option>';
+      arr.forEach(c => {
+        const opt = `<option value="${c.id}">${c.prenom} ${c.nom}</option>`;
+        sel.insertAdjacentHTML('beforeend', opt);
+        filt.insertAdjacentHTML('beforeend', opt);
+      });
+    }
+    async function refreshTypes() {
+      const arr = await getJson('/typeprets');
+      const sel = $('#select-typepret');
+      sel.innerHTML = '<option value="">Choisir…</option>';
+      arr.forEach(t => {
+        sel.insertAdjacentHTML('beforeend',
+          `<option value="${t.id}">${t.libelle} (${t.taux} %)</option>`);
+      });
+    }
+
+    /* ---------- Initialisation ---------- */
+    (async () => {
+      try { await Promise.all([refreshClients(), refreshTypes()]); }
+      catch (e) { console.error(e); alert('Erreur API'); }
+    })();
+  </script>
+</body>
+</html>
