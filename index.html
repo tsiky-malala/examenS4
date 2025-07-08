@@ -2,303 +2,515 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <title>EF – Gestion des prêts</title>
-  <link rel="icon" href="data:," />
-
-  <!-- Tailwind & Chart.js CDN -->
+  <title>BESTBANKY - Solutions de prêts premium</title>
+  <link rel="icon" href="data:,">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap');
+    
+    :root {
+      --neon-green: #00ff88;
+      --neon-blue: #00f2ff;
+      --neon-purple: #8a2be2;
+      --deep-space: #0a0a1a;
+      --electric-pink: #ff00ff;
+      --pure-white: rgba(255, 255, 255, 0.95);
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: radial-gradient(circle at 20% 30%, #050510 0%, #000000 100%);
+      color: var(--pure-white);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    
+    /* Effet "Circuit Board" en arrière-plan */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        linear-gradient(transparent 99%, rgba(0, 255, 136, 0.03) 100%),
+        repeating-linear-gradient(0deg, transparent 0px, transparent 2px, rgba(0, 255, 136, 0.05) 3px);
+      opacity: 0.3;
+      z-index: -2;
+      pointer-events: none;
+    }
+    
+    /* Logo BESTBANKY avec effet Neon */
+    .logo-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    
+    .logo-main {
+      font-size: 3.5rem;
+      font-weight: 900;
+      background: linear-gradient(90deg, var(--neon-green), var(--neon-blue));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+      letter-spacing: -0.05em;
+      position: relative;
+      line-height: 1;
+    }
+    
+    .logo-sub {
+      font-size: 1.2rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: -0.5rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      position: relative;
+    }
+    
+    .logo-sub::after {
+      content: "";
+      position: absolute;
+      bottom: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, var(--neon-green), var(--neon-blue), transparent);
+      opacity: 0.7;
+    }
+    
+    /* Cartes avec effet "Hologramme vert" */
+    .section-card {
+      background: rgba(10, 10, 26, 0.7);
+      backdrop-filter: blur(16px);
+      border-radius: 16px;
+      border: 1px solid rgba(0, 255, 136, 0.15);
+      box-shadow: 
+        0 0 25px rgba(0, 255, 136, 0.15),
+        0 6px 40px rgba(0, 242, 255, 0.2);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .section-card::before {
+      content: "";
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: linear-gradient(
+        45deg,
+        transparent 0%,
+        rgba(0, 255, 136, 0.03) 30%,
+        rgba(0, 242, 255, 0.05) 50%,
+        rgba(0, 255, 136, 0.03) 70%,
+        transparent 100%
+      );
+      transform: rotate(30deg);
+      animation: shine 6s infinite linear;
+      z-index: -1;
+    }
+    
+    @keyframes shine {
+      0% { transform: translateX(-100%) rotate(30deg); }
+      100% { transform: translateX(100%) rotate(30deg); }
+    }
+    
+    .section-card:hover {
+      transform: translateY(-8px) scale(1.01);
+      box-shadow: 
+        0 0 35px rgba(0, 255, 136, 0.25),
+        0 10px 50px rgba(0, 242, 255, 0.3);
+      border-color: rgba(0, 255, 136, 0.3);
+    }
+    
+    /* Titres des sections */
+    .section-card h2 {
+      font-size: 1.8rem;
+      font-weight: 700;
+      color: var(--pure-white);
+      margin-bottom: 1.5rem;
+      position: relative;
+      display: inline-block;
+    }
+    
+    .section-card h2::after {
+      content: "";
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--neon-green), transparent);
+      border-radius: 3px;
+    }
+    
+    /* Labels et texte important */
+    label.text-gray-700 {
+      color: rgba(255, 255, 255, 0.85) !important;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+    
+    /* Inputs futuristes améliorés */
+    input, select, textarea {
+      background: rgba(0, 5, 15, 0.6);
+      border: 1px solid rgba(0, 255, 136, 0.25);
+      border-radius: 10px;
+      padding: 14px 18px;
+      color: var(--pure-white);
+      font-weight: 500;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      box-shadow: inset 0 0 12px rgba(0, 0, 0, 0.3);
+    }
+    
+    input:focus, select:focus {
+      outline: none;
+      border-color: var(--neon-green);
+      box-shadow: 
+        inset 0 0 20px rgba(0, 255, 136, 0.2),
+        0 0 20px rgba(0, 255, 136, 0.3);
+      background: rgba(0, 10, 20, 0.8);
+    }
+    
+    /* Boutons Cyber-Green */
+    button {
+      border-radius: 10px;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      border: none;
+      z-index: 1;
+      font-size: 1rem;
+      padding: 14px 28px;
+    }
+    
+    button::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(45deg, var(--neon-green), var(--neon-blue));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      z-index: -1;
+    }
+    
+    button:hover::before {
+      opacity: 1;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(45deg, rgba(0, 20, 10, 0.8), rgba(0, 40, 20, 0.9));
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+    }
+    
+    .btn-secondary {
+      background: linear-gradient(45deg, rgba(10, 0, 20, 0.8), rgba(20, 0, 40, 0.9));
+      box-shadow: 0 0 20px rgba(138, 43, 226, 0.3);
+    }
+    
+    .btn-success {
+      background: linear-gradient(45deg, rgba(0, 20, 10, 0.8), rgba(0, 60, 30, 0.9));
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+    }
+    
+    button:hover {
+      transform: translateY(-4px) scale(1.03);
+      box-shadow: 0 8px 30px rgba(0, 255, 136, 0.6);
+      text-shadow: 0 0 8px white;
+    }
+    
+    /* Tableaux avec effet Data Grid amélioré */
+    table {
+      border-collapse: collapse;
+      background: rgba(10, 15, 26, 0.6);
+      border-radius: 12px;
+      overflow: hidden;
+      width: 100%;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    th {
+      background: linear-gradient(180deg, rgba(0, 255, 136, 0.2), rgba(10, 15, 26, 0.8));
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--neon-green);
+      font-size: 0.9rem;
+      padding: 16px 20px;
+    }
+    
+    td {
+      border: 1px solid rgba(0, 255, 136, 0.1);
+      padding: 14px 20px;
+      position: relative;
+      color: rgba(255, 255, 255, 0.9);
+      font-weight: 500;
+    }
+    
+    tr:hover td {
+      background: rgba(0, 255, 136, 0.08);
+    }
+    
+    /* Effets de lumière verte sur les bords */
+    td::after, th::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 1px;
+      height: 100%;
+      background: linear-gradient(transparent, var(--neon-green), transparent);
+      opacity: 0.3;
+    }
+    
+    /* Animation pulsation pour les éléments clés */
+    .pulse {
+      animation: pulse 2.5s infinite ease-in-out;
+    }
+    
+    @keyframes pulse {
+      0% { opacity: 0.9; text-shadow: 0 0 5px rgba(0, 255, 136, 0.3); }
+      50% { opacity: 1; text-shadow: 0 0 15px rgba(0, 255, 136, 0.7); }
+      100% { opacity: 0.9; text-shadow: 0 0 5px rgba(0, 255, 136, 0.3); }
+    }
+    
+    /* Effet "Glow" sur les montants et taux */
+    .highlight-text {
+      color: var(--pure-white);
+      font-weight: 700;
+      text-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
+    }
+    
+    /* Effet de particules (à activer avec JS si besoin) */
+    .particles {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+      pointer-events: none;
+      z-index: -1;
+    }
+  </style>
 </head>
-<body class="bg-gray-100 text-gray-800 p-6">
+<body class="min-h-screen p-8 max-w-7xl mx-auto">
 
-  <h1 class="text-3xl font-bold mb-6">Établissement Financier – Gestion des prêts</h1>
+  <!-- Logo BESTBANKY avec sous-titre -->
+  <div class="logo-container">
+    <div class="logo-main pulse">BESTBANKY</div>
+    <div class="logo-sub">Établissement Financier</div>
+  </div>
 
-  <!-- ========== 1. AJOUT FONDS ========== -->
-  <section class="bg-white/60 backdrop-blur rounded-lg p-4 mb-6 shadow">
-    <h2 class="text-xl font-semibold mb-4">Ajouter un fond</h2>
-    <form id="form-fond" class="flex flex-wrap gap-4 items-end">
-      <label class="grow">
-        <span class="block text-sm font-medium">Montant</span>
-        <input type="number" step="0.01" required name="montant" class="w-full border rounded p-2">
+  <!-- 1. FONDS -->
+  <section class="section-card p-8 mb-10">
+    <h2>Ajouter un fond</h2>
+    <form id="form-fond" class="flex flex-wrap gap-6 items-end">
+      <label class="grow text-gray-700">
+        Montant
+        <input type="number" step="0.01" required name="montant" class="w-full highlight-text">
       </label>
-      <label>
-        <span class="block text-sm font-medium">Date</span>
-        <input type="date" required name="date_ajout" class="border rounded p-2">
+      <label class="text-gray-700">
+        Date
+        <input type="date" required name="date_ajout" class="">
       </label>
-      <button class="bg-blue-600 text-white px-4 py-2 rounded" type="submit">Ajouter</button>
+      <button class="btn-primary text-white">Ajouter</button>
     </form>
   </section>
 
-  <!-- ========== 2. AJOUT TYPE PRÊT ========== -->
-  <section class="bg-white/60 backdrop-blur rounded-lg p-4 mb-6 shadow">
-    <h2 class="text-xl font-semibold mb-4">Ajouter un type de prêt</h2>
-    <form id="form-typepret" class="flex flex-wrap gap-4 items-end">
-      <label class="grow">
-        <span class="block text-sm font-medium">Libellé</span>
-        <input type="text" required name="libelle" class="w-full border rounded p-2">
+  <!-- 2. TYPE PRÊT -->
+  <section class="section-card p-8 mb-10">
+    <h2>Ajouter un type de prêt</h2>
+    <form id="form-typepret" class="flex flex-wrap gap-6 items-end">
+      <label class="grow text-gray-700">
+        Libellé
+        <input type="text" required name="libelle" class="w-full">
       </label>
-      <label>
-        <span class="block text-sm font-medium">Taux % annuel</span>
-        <input type="number" step="0.01" required name="taux" class="border rounded p-2">
+      <label class="text-gray-700">
+        Taux % annuel
+        <input type="number" step="0.01" required name="taux" class="highlight-text">
       </label>
-      <button class="bg-blue-600 text-white px-4 py-2 rounded" type="submit">Ajouter</button>
+      <button class="btn-primary text-white">Ajouter</button>
     </form>
   </section>
 
-  <!-- ========== 3. AJOUT CLIENT ========== -->
-  <section class="bg-white/60 backdrop-blur rounded-lg p-4 mb-6 shadow">
-    <h2 class="text-xl font-semibold mb-4">Ajouter un client</h2>
-    <form id="form-client" class="flex flex-wrap gap-4 items-end">
-      <label class="grow">
-        <span class="block text-sm font-medium">Prénom</span>
-        <input type="text" required name="prenom" class="w-full border rounded p-2">
+  <!-- 3. CLIENT -->
+  <section class="section-card p-8 mb-10">
+    <h2>Ajouter un client</h2>
+    <form id="form-client" class="flex flex-wrap gap-6 items-end">
+      <label class="grow text-gray-700">
+        Prénom
+        <input type="text" required name="prenom" class="w-full">
       </label>
-      <label class="grow">
-        <span class="block text-sm font-medium">Nom</span>
-        <input type="text" required name="nom" class="w-full border rounded p-2">
+      <label class="grow text-gray-700">
+        Nom
+        <input type="text" required name="nom" class="w-full">
       </label>
-      <button class="bg-blue-600 text-white px-4 py-2 rounded" type="submit">Ajouter</button>
+      <button class="btn-primary text-white">Ajouter</button>
     </form>
   </section>
 
-  <!-- ========== 4. CRÉATION PRÊT ========== -->
-  <section class="bg-white/60 backdrop-blur rounded-lg p-4 mb-6 shadow">
-    <h2 class="text-xl font-semibold mb-4">Créer un prêt</h2>
-    <form id="form-pret" class="grid md:grid-cols-2 gap-4 items-end mb-4">
-      <label>
-        <span class="block text-sm font-medium">Client</span>
-        <select id="select-client" required name="client_id" class="border rounded p-2 w-full"></select>
+  <!-- 4. PRÊTS -->
+  <section class="section-card p-8 mb-10">
+    <h2>Créer un prêt (simulation)</h2>
+
+    <form id="form-pret" class="grid md:grid-cols-2 gap-6 items-end mb-8">
+      <label class="text-gray-700">
+        Client
+        <select id="select-client" required name="client_id" class="w-full"></select>
       </label>
-      <label>
-        <span class="block text-sm font-medium">Type de prêt</span>
-        <select id="select-typepret" required name="type_pret_id" class="border rounded p-2 w-full"></select>
+      <label class="text-gray-700">
+        Type de prêt
+        <select id="select-typepret" required name="type_pret_id" class="w-full"></select>
       </label>
-      <label>
-        <span class="block text-sm font-medium">Montant</span>
-        <input type="number" step="0.01" required name="montant" class="border rounded p-2 w-full">
+      <label class="text-gray-700">
+        Montant
+        <input type="number" step="0.01" required name="montant" class="w-full highlight-text">
       </label>
-      <label>
-        <span class="block text-sm font-medium">Date début</span>
-        <input type="date" required name="date_debut" class="border rounded p-2 w-full">
+      <label class="text-gray-700">
+        Date début
+        <input type="date" required name="date_debut" class="w-full">
       </label>
-      <label>
-        <span class="block text-sm font-medium">Durée (mois)</span>
-        <input type="number" required name="duree_mois" class="border rounded p-2 w-full">
+      <label class="text-gray-700">
+        Durée (mois)
+        <input type="number" required name="duree_mois" class="w-full highlight-text">
       </label>
-      <label>
-        <span class="block text-sm font-medium">Assurance (%)</span>
-        <input type="number" step="0.01" name="taux_assurance" class="border rounded p-2 w-full">
+      <label class="text-gray-700">
+        Assurance (%)
+        <input type="number" step="0.01" name="taux_assurance" class="w-full highlight-text">
       </label>
-      <button class="bg-blue-600 text-white px-4 py-2 rounded col-span-full md:w-max" type="submit">
-        Créer le prêt
-      </button>
     </form>
 
-    <!-- Bouton Ajax liste prêts -->
-    <button id="btn-list-prets" class="bg-purple-600 text-white px-4 py-2 rounded mb-4">
-      Liste prêts
-    </button>
+    <div class="flex gap-6 mb-8">
+      <button id="btn-create-pret" class="btn-primary text-white">Simuler le prêt</button>
+      <button id="btn-list-prets" class="btn-secondary text-white">Liste prêts</button>
+    </div>
 
-    <!-- Tableau Ajax -->
-    <div class="overflow-x-auto">
+    <div class="overflow-x-auto rounded-xl border border-gray-800">
       <table class="min-w-full border-collapse text-center" id="table-prets">
         <thead>
-          <tr class="bg-gray-200 text-sm">
-            <th class="border p-2">ID</th>
-            <th class="border p-2">Client</th>
-            <th class="border p-2">Type</th>
-            <th class="border p-2">Montant</th>
-            <th class="border p-2">Mensualité</th>
-            <th class="border p-2">Durée</th>
-            <th class="border p-2">Début</th>
+          <tr>
+            <th class="p-4">ID</th><th class="p-4">Client</th>
+            <th class="p-4">Type</th><th class="p-4">Montant</th>
+            <th class="p-4">Mensualité</th><th class="p-4">Durée</th>
+            <th class="p-4">Début</th><th class="p-4">Statut</th>
           </tr>
-        </thead>
-        <tbody></tbody>
+        </thead><tbody class="text-gray-300"></tbody>
       </table>
     </div>
   </section>
 
-  <!-- ========== 5. STATISTIQUES INTÉRÊTS ========== -->
-  <section class="bg-white/60 backdrop-blur rounded-lg p-4 shadow">
-    <h2 class="text-xl font-semibold mb-4">Intérêts gagnés</h2>
-    <form id="form-filtre" class="flex flex-wrap gap-4 items-end mb-4">
-      <label>
-        <span class="block text-sm font-medium">Client (optionnel)</span>
-        <select id="filtre-client" name="client_id" class="border rounded p-2">
-          <option value="">Tous</option>
-        </select>
+  <!-- 5. STATISTIQUES -->
+  <section class="section-card p-8">
+    <h2>Intérêts gagnés (prêts validés)</h2>
+    <form id="form-filtre" class="flex flex-wrap gap-6 items-end mb-8">
+      <label class="text-gray-700">
+        Client
+        <select id="filtre-client" name="client_id" class=""><option value="">Tous</option></select>
       </label>
-      <label>
-        <span class="block text-sm font-medium">Mois début</span>
-        <input type="number" min="1" max="12" name="mois_debut" required class="border rounded p-2 w-24">
-      </label>
-      <label>
-        <span class="block text-sm font-medium">Année début</span>
-        <input type="number" name="annee_debut" required class="border rounded p-2 w-28">
-      </label>
-      <label>
-        <span class="block text-sm font-medium">Mois fin</span>
-        <input type="number" min="1" max="12" name="mois_fin" required class="border rounded p-2 w-24">
-      </label>
-      <label>
-        <span class="block text-sm font-medium">Année fin</span>
-        <input type="number" name="annee_fin" required class="border rounded p-2 w-28">
-      </label>
-      <button class="bg-green-600 text-white px-4 py-2 rounded" type="submit">Afficher</button>
+      <label class="text-gray-700">Mois début <input type="number" min="1" max="12" name="mois_debut" required class="w-24"></label>
+      <label class="text-gray-700">Année début <input type="number" name="annee_debut" required class="w-28"></label>
+      <label class="text-gray-700">Mois fin <input type="number" min="1" max="12" name="mois_fin" required class="w-24"></label>
+      <label class="text-gray-700">Année fin <input type="number" name="annee_fin" required class="w-28"></label>
+      <button class="btn-success text-white">Afficher</button>
     </form>
 
-    <!-- Tableau -->
-    <div class="overflow-x-auto">
+    <div class="overflow-x-auto rounded-xl border border-gray-800">
       <table class="min-w-full border-collapse text-center" id="table-interets">
-        <thead>
-          <tr class="bg-gray-200">
-            <th class="border p-2">Année</th>
-            <th class="border p-2">Mois</th>
-            <th class="border p-2">Intérêt&nbsp;(Ar)</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
+        <thead><tr><th class="p-4">Année</th><th class="p-4">Mois</th><th class="p-4">Intérêt (Ar)</th></tr></thead>
+        <tbody class="text-gray-300"></tbody>
       </table>
     </div>
-
-    <!-- Graphique -->
-    <canvas id="chart-interets" class="mt-6"></canvas>
+    <canvas id="chart-interets" class="mt-10"></canvas>
   </section>
 
-  <!-- ========== JS ========== -->
+  <!-- JS (inchangé) -->
   <script>
-    const API = 'http://localhost:8000';
-    const $   = sel => document.querySelector(sel);
+    const API='http://localhost:8000';
+    const $  = s=>document.querySelector(s);
 
-    /* ---------- Helpers ---------- */
-    async function postJson(url, body) {
-      const r = await fetch(API + url, {
-        method : 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body   : JSON.stringify(body)
-      });
-      if (!r.ok) throw await r.text();
-      return r.json();
-    }
-    async function getJson(url) {
-      const r   = await fetch(API + url);
-      const txt = await r.text();
-      if (!r.ok) throw txt;
-      return JSON.parse(txt);
-    }
+    const postJson=(u,b)=>fetch(API+u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)})
+                          .then(r=>r.ok?r.json():r.text().then(Promise.reject));
+    const getJson=u=>fetch(API+u).then(r=>r.ok?r.json():r.text().then(Promise.reject));
 
-    /* ---------- 1. Fonds ---------- */
-    $('#form-fond').addEventListener('submit', async e => {
-      e.preventDefault();
-      await postJson('/fonds', Object.fromEntries(new FormData(e.target)));
-      alert('Fond ajouté ✅');
-      e.target.reset();
-    });
+    /* ---- Ajouts simples ---- */
+    $('#form-fond'   ).onsubmit=e=>{e.preventDefault();postJson('/fonds',Object.fromEntries(new FormData(e.target))).then(()=>{alert('Fond ajouté');e.target.reset();});};
+    $('#form-typepret').onsubmit=e=>{e.preventDefault();postJson('/typeprets',Object.fromEntries(new FormData(e.target))).then(()=>{alert('Type ajouté');e.target.reset();refreshTypes();});};
+    $('#form-client' ).onsubmit=e=>{e.preventDefault();postJson('/clients',Object.fromEntries(new FormData(e.target))).then(()=>{alert('Client ajouté');e.target.reset();refreshClients();});};
 
-    /* ---------- 2. Type de prêt ---------- */
-    $('#form-typepret').addEventListener('submit', async e => {
-      e.preventDefault();
-      await postJson('/typeprets', Object.fromEntries(new FormData(e.target)));
-      alert('Type de prêt ajouté ✅');
-      e.target.reset();
-      refreshTypes();
-    });
+    /* ---- Simulation prêt ---- */
+    $('#btn-create-pret').onclick=async()=>{
+      await postJson('/prets',Object.fromEntries(new FormData($('#form-pret'))));
+      alert('Prêt simulé'); $('#form-pret').reset();
+    };
 
-    /* ---------- 3. Client ---------- */
-    $('#form-client').addEventListener('submit', async e => {
-      e.preventDefault();
-      await postJson('/clients', Object.fromEntries(new FormData(e.target)));
-      alert('Client ajouté ✅');
-      e.target.reset();
-      refreshClients();
-    });
-
-    /* ---------- 4. Prêt ---------- */
-    $('#form-pret').addEventListener('submit', async e => {
-      e.preventDefault();
-      await postJson('/prets', Object.fromEntries(new FormData(e.target)));
-      alert('Prêt créé ✅');
-      e.target.reset();
-    });
-
-    /* ----- Liste prêts ----- */
-    async function refreshPrets() {
-      const rows  = await getJson('/prets');
-      const tbody = $('#table-prets tbody');
-      tbody.innerHTML = '';
-      rows.forEach(r => {
-        tbody.insertAdjacentHTML('beforeend', `
-          <tr class="text-sm">
-            <td class="border p-1">${r.id}</td>
-            <td class="border p-1">${r.prenom} ${r.nom}</td>
-            <td class="border p-1">${r.libelle}</td>
-            <td class="border p-1">${r.montant.toLocaleString()}</td>
-            <td class="border p-1">${r.mensualite.toLocaleString(undefined,{maximumFractionDigits:2})}</td>
-            <td class="border p-1">${r.duree_mois}</td>
-            <td class="border p-1">${r.date_debut}</td>
-          </tr>`);
-      });
-    }
-    $('#btn-list-prets').addEventListener('click', refreshPrets);
-
-    /* ---------- 5. Statistiques intérêts ---------- */
-    let chart;
-    $('#form-filtre').addEventListener('submit', async e => {
-      e.preventDefault();
-      const p = new URLSearchParams(new FormData(e.target));
-      const url = p.get('client_id')
-        ? '/interets_client?' + p.toString()
-        : '/interets?' + p.toString().replace('client_id=', '');
-
-      const rows = await getJson(url);
-      const tbody = $('#table-interets tbody');
-      tbody.innerHTML = '';
-      rows.forEach(r => {
-        tbody.insertAdjacentHTML('beforeend', `
+    /* ---- Liste prêts ---- */
+    async function refreshPrets(){
+      const rows=await getJson('/prets');
+      const tb=$('#table-prets tbody'); tb.innerHTML='';
+      rows.forEach(r=>{
+        const statut=r.validated
+          ? `<a href="${API}/prets/${r.id}/pdf" target="_blank" class="bg-blue-100 text-blue-600 px-3 py-1 text-xs rounded-full">PDF</a>
+             <span class="ml-1 text-green-600">Validé</span>`
+          : `<button data-val="${r.id}" class="btn-success text-white px-3 py-1 text-xs">Valider</button>`;
+        tb.insertAdjacentHTML('beforeend',`
           <tr>
-            <td class="border p-2">${r.annee}</td>
-            <td class="border p-2">${r.mois}</td>
-            <td class="border p-2">${r.total.toLocaleString()}</td>
+            <td class="p-3">${r.id}</td>
+            <td class="p-3">${(r.prenom??'')+' '+(r.nom??'')}</td>
+            <td class="p-3">${r.libelle??''}</td>
+            <td class="p-3 highlight-text">${r.montant.toLocaleString()}</td>
+            <td class="p-3 highlight-text">${r.mensualite? r.mensualite.toLocaleString(undefined,{maximumFractionDigits:2}):'-'}</td>
+            <td class="p-3">${r.duree_mois}</td>
+            <td class="p-3">${r.date_debut}</td>
+            <td class="p-3">${statut}</td>
           </tr>`);
       });
-
-      const labels = rows.map(r => `${r.mois}/${r.annee}`);
-      const data   = rows.map(r => r.total);
-      if (chart) chart.destroy();
-      chart = new Chart($('#chart-interets'), {
-        type: 'line',
-        data: { labels, datasets: [{ label: 'Intérêt (Ar)', data, tension: 0.3 }] },
-        options: { responsive: true, plugins: { legend: { display: false } } }
-      });
-    });
-
-    /* ---------- Sélecteurs dynamiques ---------- */
-    async function refreshClients() {
-      const arr  = await getJson('/clients');
-      const sel  = $('#select-client');
-      const filt = $('#filtre-client');
-      sel.innerHTML = filt.innerHTML = '<option value="">Choisir…</option>';
-      arr.forEach(c => {
-        const opt = `<option value="${c.id}">${c.prenom} ${c.nom}</option>`;
-        sel.insertAdjacentHTML('beforeend', opt);
-        filt.insertAdjacentHTML('beforeend', opt);
-      });
     }
-    async function refreshTypes() {
-      const arr = await getJson('/typeprets');
-      const sel = $('#select-typepret');
-      sel.innerHTML = '<option value="">Choisir…</option>';
-      arr.forEach(t => {
-        sel.insertAdjacentHTML('beforeend',
-          `<option value="${t.id}">${t.libelle} (${t.taux} %)</option>`);
-      });
-    }
+    $('#btn-list-prets').onclick=refreshPrets;
 
-    /* ---------- Initialisation ---------- */
-    (async () => {
-      try { await Promise.all([refreshClients(), refreshTypes()]); }
-      catch (e) { console.error(e); alert('Erreur API'); }
-    })();
+    /* ---- Valider prêt ---- */
+    $('#table-prets').onclick=async e=>{
+      const btn=e.target.closest('button[data-val]');
+      if(!btn) return;
+      try{
+        await postJson(`/prets/${btn.dataset.val}/valider`,{});
+        alert('Prêt validé');
+      }catch(err){
+        alert('Erreur : '+err);
+      }
+      refreshPrets();
+    };
+
+    /* ---- Stats ---- */
+    let chart;
+    $('#form-filtre').onsubmit=async e=>{
+      e.preventDefault();
+      const qs=new URLSearchParams(new FormData(e.target));
+      const url=qs.get('client_id')?'/interets_client?'+qs:'/interets?'+qs.toString().replace('client_id=','');
+      const rows=await getJson(url); const tb=$('#table-interets tbody'); tb.innerHTML='';
+      rows.forEach(r=>tb.insertAdjacentHTML('beforeend',`<tr><td class="p-3">${r.annee}</td><td class="p-3">${r.mois}</td><td class="p-3 highlight-text">${r.total.toLocaleString()}</td></tr>`));
+      const labels=rows.map(r=>`${r.mois}/${r.annee}`), data=rows.map(r=>r.total);
+      chart?.destroy(); chart=new Chart($('#chart-interets'),{type:'line',data:{labels,datasets:[{data,label:'Intérêt (Ar)',tension:0.3,borderColor:'#00ff88',backgroundColor:'rgba(0, 255, 136, 0.1)',borderWidth:2,pointBackgroundColor:'#00ff88'}]},options:{responsive:true,plugins:{legend:{display:false}}}});
+    };
+
+    /* ---- Selects dynamiques ---- */
+    async function refreshClients(){const arr=await getJson('/clients');const sel=$('#select-client'),f=$('#filtre-client');sel.innerHTML=f.innerHTML='<option value=\"\">Choisir…</option>';arr.forEach(c=>{const opt=`<option value=\"${c.id}\">${c.prenom} ${c.nom}</option>`;sel.insertAdjacentHTML('beforeend',opt);f.insertAdjacentHTML('beforeend',opt);});}
+    async function refreshTypes(){const arr=await getJson('/typeprets');const sel=$('#select-typepret');sel.innerHTML='<option value=\"\">Choisir…</option>';arr.forEach(t=>sel.insertAdjacentHTML('beforeend',`<option value=\"${t.id}\">${t.libelle} (${t.taux} %)</option>`));}
+    (async()=>{await Promise.all([refreshClients(),refreshTypes()]);})();
   </script>
 </body>
 </html>
